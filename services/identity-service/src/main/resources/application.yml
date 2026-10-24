@@ -1,0 +1,25 @@
+server:
+  port: ${PORT:8081}
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+  flyway:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+server.error.include-message: never
+server.error.include-stacktrace: never
+auth:
+  issuer: ${IDENTITY_ISSUER_URI}
+  private-key-file: ${IDENTITY_PRIVATE_KEY_FILE}
+  public-key-file: ${IDENTITY_PUBLIC_KEY_FILE}
