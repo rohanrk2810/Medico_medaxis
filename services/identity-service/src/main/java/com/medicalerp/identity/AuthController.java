@@ -19,7 +19,7 @@ class AuthController {
  @PostMapping("/api/v1/auth/logout") ResponseEntity<?> logout(@Valid @RequestBody Logout request){auth.logout(request.refreshToken());return ResponseEntity.noContent().cacheControl(CacheControl.noStore()).build();}
  @GetMapping("/api/v1/auth/jwks") Map<String,Object> keys(){return new JWKSet(key.toPublicJWK()).toJSONObject();}
  @GetMapping("/api/v1/me") ResponseEntity<?> me(@AuthenticationPrincipal Jwt jwt){
-  if(!auth.active(jwt.getClaimAsString("sid"),jwt.getSubject()))return ResponseEntity.status(401).build();
+  if(!auth.active(jwt.getClaimAsString("sid"),jwt.getSubject(),jwt.getClaimAsString("tenant_id"),jwt.getClaimAsString("branch_id"),jwt.getClaimAsString("scope")))return ResponseEntity.status(401).build();
   return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(Map.of("userId",jwt.getSubject(),"tenantId",jwt.getClaimAsString("tenant_id"),"branchId",jwt.getClaimAsString("branch_id"),"scope",jwt.getClaimAsString("scope")));
  }
  private ResponseEntity<?> response(AuthService.Tokens tokens){return tokens==null?ResponseEntity.status(401).cacheControl(CacheControl.noStore()).body(Map.of("code","AUTHENTICATION_FAILED","message","Sign-in or session could not be verified")):ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(tokens);}

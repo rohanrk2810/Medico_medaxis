@@ -41,6 +41,9 @@ class AuthIntegrationTest {
   Map<?,?> tokens=response.getBody();assertNotNull(tokens);String refresh=(String)tokens.get("refreshToken");
   HttpHeaders headers=new HttpHeaders();headers.setBearerAuth((String)tokens.get("accessToken"));
   assertEquals(200,http.exchange("/api/v1/me",HttpMethod.GET,new HttpEntity<>(headers),Map.class).getStatusCode().value());
+  db.update("DELETE FROM user_grants WHERE user_id=?",user);
+  assertEquals(401,http.exchange("/api/v1/me",HttpMethod.GET,new HttpEntity<>(headers),Map.class).getStatusCode().value());
+  db.update("INSERT INTO user_grants(user_id,branch_id,permission) VALUES (?,?,?)",user,branch,"tenant:read");
   var renewed=http.postForEntity("/api/v1/auth/refresh",Map.of("refreshToken",refresh,"branchId",branch),Map.class);assertEquals(200,renewed.getStatusCode().value());
   assertEquals(401,http.postForEntity("/api/v1/auth/refresh",Map.of("refreshToken",refresh,"branchId",branch),Map.class).getStatusCode().value());
   assertEquals(401,http.exchange("/api/v1/me",HttpMethod.GET,new HttpEntity<>(headers),Map.class).getStatusCode().value());

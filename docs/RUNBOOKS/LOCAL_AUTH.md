@@ -17,7 +17,7 @@ Never commit these files. Configure `IDENTITY_PRIVATE_KEY_FILE` and `IDENTITY_PU
 ## Service configuration
 Each service uses its own PostgreSQL database and credentials: `DATABASE_URL` (JDBC URL), `DATABASE_USER`, `DATABASE_PASSWORD`. Flyway runs on startup. Do not point services at each other's databases.
 
-For identity set `IDENTITY_ISSUER_URI=http://localhost:8081` and the key-file variables. For tenant use the same issuer plus `IDENTITY_JWKS_URI=http://localhost:8081/api/v1/auth/jwks`. Gateway defaults route to identity 8081 and tenant 8082; it listens on 8080. Run each built jar from services/<name>/target. Start Angular with `npm start`; its development proxy sends /api to the gateway.
+For identity set `IDENTITY_ISSUER_URI=http://localhost:8081` and the key-file variables. For tenant set `IDENTITY_SESSION_URL=http://localhost:8081/api/v1/me` (use an internal service address in containers), the same issuer plus `IDENTITY_JWKS_URI=http://localhost:8081/api/v1/auth/jwks`. Gateway defaults route to identity 8081 and tenant 8082; it listens on 8080. Run each built jar from services/<name>/target. Start Angular with `npm start`; its development proxy sends /api to the gateway.
 
 ## Synthetic account
 Only for local development, enable `SPRING_PROFILES_ACTIVE=synthetic-dev` on identity and tenant. Set the same randomly generated `DEV_TENANT_ID` and `DEV_BRANCH_ID` UUIDs for both. Identity also needs a random `DEV_USER_ID` and a private `DEV_PASSWORD` (16+ characters, max 72 UTF-8 bytes). The synthetic email is admin@example.test. No fixed password is shipped. Sign in using these hospital/branch IDs and credentials. Seed inserts never replace existing user passwords.
@@ -25,4 +25,4 @@ Only for local development, enable `SPRING_PROFILES_ACTIVE=synthetic-dev` on ide
 Synthetic locale IN/Asia/Kolkata/INR is example fixture data only, not a product or jurisdiction default. The dashboard reads locale values from tenant-service.
 
 ## Current limitations
-Tenant admin provisioning screens are pending. Refresh is manual and memory-only sessions end on reload. Resource-service JWT revocation is bounded by five-minute expiry. Tenant suspension propagation, audit outbox delivery, password reset, MFA, global request limits and full browser E2E remain pending. Do not deploy this development slice as a finished ERP.
+Tenant admin provisioning screens are pending. Refresh is manual and memory-only sessions end on reload. Tenant configuration requests revalidate session and current grants through identity; identity failure denies access. Tenant suspension propagation, audit outbox delivery, password reset, MFA, global request limits and full browser E2E remain pending. Do not deploy this development slice as a finished ERP.

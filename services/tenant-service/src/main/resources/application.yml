@@ -22,3 +22,4 @@ server.error.include-stacktrace: never
 spring.security.oauth2.resourceserver.jwt.issuer-uri: ${IDENTITY_ISSUER_URI}
 spring.security.oauth2.resourceserver.jwt.audiences: medical-erp
 spring.security.oauth2.resourceserver.jwt.jwk-set-uri: ${IDENTITY_JWKS_URI}
+identity.session-url: ${IDENTITY_SESSION_URL:http://localhost:8081/api/v1/me}

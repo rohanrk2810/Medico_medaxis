@@ -62,5 +62,12 @@ class AuthService {
   db.update("UPDATE refresh_sessions SET revoked_at=now() WHERE token_hash=? AND revoked_at IS NULL",hash(raw));
   if(!users.isEmpty())audit(users.getFirst().tenantId(),users.getFirst().id(),"LOGOUT");
  }
- boolean active(String sid,String user){return Boolean.TRUE.equals(db.queryForObject("SELECT EXISTS(SELECT 1 FROM refresh_sessions s JOIN users u ON u.id=s.user_id WHERE s.id=? AND u.id=? AND u.enabled=true AND s.revoked_at IS NULL AND s.expires_at>now())",Boolean.class,UUID.fromString(sid),UUID.fromString(user)));}
+ boolean active(String sid,String user,String tenant,String branch,String scope){
+  try {
+   UUID userId=UUID.fromString(user),branchId=UUID.fromString(branch);
+   boolean live=Boolean.TRUE.equals(db.queryForObject("SELECT EXISTS(SELECT 1 FROM refresh_sessions s JOIN users u ON u.id=s.user_id WHERE s.id=? AND u.id=? AND u.tenant_id=? AND u.enabled=true AND s.revoked_at IS NULL AND s.expires_at>now())",Boolean.class,UUID.fromString(sid),userId,UUID.fromString(tenant)));
+   var granted=permissions(userId,branchId);
+   return live && scope!=null && !scope.isBlank() && !granted.isEmpty() && granted.containsAll(List.of(scope.split(" ")));
+  }catch(IllegalArgumentException e){return false;}
+ }
 }
