@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.angular/
+target/
+.env
+*.log
+.env.*
+!.env.example
+*.pem
